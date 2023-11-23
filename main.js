@@ -176,10 +176,7 @@ function deleteFile(filePath) {
   files.forEach((file) => {
     file.innerHTML.startsWith(filePath) && file.remove();
   });
-  // Uncomment below lines to also remove the file from the data array and update the tree.
-  // data = data.filter(path => !path.endsWith(filePath));
-  // tree = buildTree(data);
-  // updateTreeDisplay();
+  data = data.filter(path => !path.endsWith(filePath));
 }
 
 
