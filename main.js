@@ -199,7 +199,7 @@ module.exports = {
   setClicks,
   fileClicks,
   addFile,
-  updateTreeDisplay,
+  createTreeDom,
   editFile,
   deleteFile,
   data,
