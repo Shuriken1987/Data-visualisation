@@ -1,0 +1,35 @@
+#data-tree {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    color: #333;
+}
+
+.directory, .file {
+    margin-left: 20px;
+}
+
+.directory:before {
+    content: '📁 ';
+    color: #ff8c00;
+}
+
+.file:before {
+    content: '📄 ';
+    color: #1e90ff;
+}
+
+.directory ul {
+    display: none;
+}
+
+.directory.open ul {
+    display: block;
+}
+
+.edit, .delete {
+  cursor: pointer;
+  margin-left: 10px;
+  color: #ff8c00;
+}
+
+
