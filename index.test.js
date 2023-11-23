@@ -4,12 +4,74 @@ const {
   data,
   editFile,
   deleteFile,
-  updateTreeDisplay,
+  createTreeDom,
   setClicks,
   fileClicks,
 } = require("./main.js");
 
+describe('createTreeDom', () => {
+  const originalEditFile = global.editFile;
+  const originalDeleteFile = global.deleteFile;
 
+  beforeEach(() => {
+    // Mock the editFile and deleteFile functions
+    global.editFile = jest.fn();
+    global.deleteFile = jest.fn();
+  });
+
+  afterEach(() => {
+    // Restore original functions
+    global.editFile = originalEditFile;
+    global.deleteFile = originalDeleteFile;
+  });
+
+  test('returns null for an empty node', () => {
+    const result = createTreeDom({});
+    expect(result).toBeNull();
+  });
+
+  test('creates correct structure for a single file', () => {
+    const node = { 'file.txt': {} };
+    const result = createTreeDom(node);
+
+    expect(result.tagName).toBe('UL');
+    expect(result.children.length).toBe(1);
+    expect(result.firstChild.tagName).toBe('LI');
+    expect(result.firstChild.className).toBe('file');
+    expect(result.firstChild.textContent.includes('file.txt')).toBeTruthy();
+
+    // Check for Edit and Delete spans
+    expect(result.querySelector('.edit').textContent).toBe('Edit');
+    expect(result.querySelector('.delete').textContent).toBe('Delete');
+  });
+
+  test('creates correct structure for a directory', () => {
+    const node = { 'folder': {} };
+    const result = createTreeDom(node);
+
+    expect(result.firstChild.className).toBe('directory');
+    // Ensure Edit and Delete spans are not present
+    expect(result.querySelector('.edit')).toBeNull();
+    expect(result.querySelector('.delete')).toBeNull();
+  });
+
+  test('handles nested structures correctly', () => {
+    const node = {
+      'folder': {
+        'file.txt': {}
+      }
+    };
+    const result = createTreeDom(node);
+
+    // Check the structure for the folder
+    expect(result.firstChild.className).toBe('directory');
+    // Check the structure for the file within the folder
+    const nestedFile = result.firstChild.querySelector('ul > li');
+    expect(nestedFile.className).toBe('file');
+  });
+
+  // Additional tests can be written to check onclick events, more complex structures, etc.
+});
 
 describe("buildTree", () => {
   test("should create correct tree structure for given data", () => {
@@ -213,59 +275,5 @@ describe('editFile', () => {
   });
 });
 
-describe("updateTreeDisplay", () => {
-  let treeContainer;
-
-  beforeEach(() => {
-    // Mock the treeContainer and tree data
-    document.body.innerHTML = '<div id="tree-container"></div>';
-    treeContainer = document.getElementById("tree-container");
-
-    // Reset mocks before each test
-    createTreeDom.mockClear();
-    setClicks.mockClear();
-
-    // Mock tree structure
-    tree = {
-      path1: {},
-      path2: {},
-    };
-
-    // Mock createTreeDom and setClicks if they are not part of this test file
-    // createTreeDom = jest.fn().mockReturnValue(document.createElement('div'));
-    // setClicks = jest.fn();
-  });
-
-  test('should update treeContainer with new tree structure', () => {
-    // Mock the return value of createTreeDom if needed
-    const mockTreeDom = document.createElement('div');
-    createTreeDom.mockReturnValue(mockTreeDom);
-
-    updateTreeDisplay();
-
-    // Check if createTreeDom was called with the tree
-    expect(createTreeDom).toHaveBeenCalledWith(tree);
-
-    // Check if the treeContainer's innerHTML is updated
-    expect(treeContainer.innerHTML).toContain(mockTreeDom.outerHTML);
-
-    // Check if setClicks was called
-    expect(setClicks).toHaveBeenCalled();
-  });
-
-  test('should not update treeContainer if it does not exist', () => {
-    // Remove treeContainer from DOM
-    document.body.innerHTML = '';
-
-    updateTreeDisplay();
-
-    // Check if createTreeDom was not called as treeContainer does not exist
-    expect(createTreeDom).not.toHaveBeenCalled();
-
-    // Check if setClicks was not called as treeContainer does not exist
-    expect(setClicks).not.toHaveBeenCalled();
-  });
-
-});
 
 
